@@ -61,9 +61,9 @@ class CommentController extends Controller
             $data['user_id'] = Auth::id();
             $this->comment_service->createNewComment($data, $id);
         } catch (Exception $error) {
-            return redirect()->route('hikyos.index')->with('error', 'コメントの投稿ができませんでした。');
+            return redirect()->route('hikyos.show', $id)->with('error', 'コメントの投稿ができませんでした。');
         }
-        return redirect()->route('hikyos.index')->with('success', 'コメントを投稿しました');
+        return redirect()->route('hikyos.show', $id)->with('success', 'コメントを投稿しました');
     }
 
     /**

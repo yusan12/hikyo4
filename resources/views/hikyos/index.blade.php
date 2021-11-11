@@ -31,10 +31,10 @@
                             </div>
                             <button type="submit" class="btn btn-primary">書き込む</button>
                         </form>
-                        <a href="#">全部読む</a>
-                        <a href="#">最新50</a>
-                        <a href="#">1-100</a>
-                        <a href="#">リロード</a>
+                        <a href="{{ route('hikyos.show', $hikyo->id) }}">全部読む</a>
+                        <a href="{{ route('hikyos.show', $hikyo->id) }}">最新50</a>
+                        <a href="{{ route('hikyos.show', $hikyo->id) }}">1-100</a>
+                        <a href="{{ route('hikyos.index') }}">リロード</a>
                     </div>
                 </div>
             </div>

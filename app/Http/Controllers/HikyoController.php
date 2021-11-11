@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\HikyoRequest;
 use App\Services\HikyoService;
+use App\Repositories\HikyoRepository;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
@@ -14,6 +15,14 @@ class HikyoController extends Controller
      * @var hikyoService
      */
     protected $hikyo_service;
+
+    /**
+     * The HikyoRepository implementation.
+     *
+     * @var HikyoRepository
+     */
+    protected $hikyo_repository;
+
     /**
      * Create a new controller instance.
      *
@@ -21,10 +30,12 @@ class HikyoController extends Controller
      * @return void
      */
     public function __construct(
-        HikyoService $hikyo_service // インジェクション
+        HikyoService $hikyo_service, // インジェクション
+        HikyoRepository $hikyo_repository
     ) {
         $this->middleware('auth')->except('index');
         $this->hikyo_service = $hikyo_service; // プロパティに代入する。
+        $this->hikyo_repository = $hikyo_repository;
     }
     /**
      * Display a listing of the resource.
@@ -75,7 +86,9 @@ class HikyoController extends Controller
      */
     public function show($id)
     {
-        //
+        $hikyo = $this->hikyo_repository->findById($id);
+        $hikyo->load('comments.user');
+        return view('hikyos.show', compact('hikyo'));
     }
 
     /**
