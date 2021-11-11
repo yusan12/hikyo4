@@ -4,15 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\HikyoRequest;
-use App\Comment;
-use App\Hikyo;
+use App\Services\HikyoService;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class HikyoController extends Controller
 {
-    public function __construct()
-    {
+    /**
+     * @var hikyoService
+     */
+    protected $hikyo_service;
+    /**
+     * Create a new controller instance.
+     *
+     * @param  HikyoService  $hikyo_service
+     * @return void
+     */
+    public function __construct(
+        HikyoService $hikyo_service // インジェクション
+    ) {
         $this->middleware('auth')->except('index');
+        $this->hikyo_service = $hikyo_service; // プロパティに代入する。
     }
     /**
      * Display a listing of the resource.
@@ -37,27 +49,19 @@ class HikyoController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  App\Http\Requests\ThreadRequest  $request
+     * @param  App\Http\Requests\HikyoRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function store(HikyoRequest $request)
     {
-        // save Hikyo
-        $hikyo = new Hikyo();
-        $hikyo->name = $request->name;
-        $hikyo->user_id = Auth::id();
-        $hikyo->place = $request->place;
-        $hikyo->introduction = $request->introduction;
-        $hikyo->time_from_tokyo = $request->time_from_tokyo;
-        $hikyo->how_much_from_tokyo = $request->how_much_from_tokyo;
-        $hikyo->caution = $request->caution;
-        $hikyo->save();
-        // save comment
-        $comment = new Comment();
-        $comment->body = $request->content;
-        $comment->user_id = Auth::id();
-        $comment->hikyo_id = $hikyo->id;
-        $comment->save();
+        try {
+            $data = $request->only(
+                ['name', 'content', 'place', 'introduction', 'time_from_tokyo', 'how_much_from_tokyo', 'caution']
+            );
+            $this->hikyo_service->createNewHikyo($data, Auth::id()); // new せずとも $this-> の形で呼び出せる（インジェクションした為）。
+        } catch (Exception $error) {
+            return redirect()->route('hikyos.index')->with('error', '秘境の新規作成に失敗しました。');
+        }
         // redirect to index method
         return redirect()->route('hikyos.index')->with('success', '秘境の新規作成が完了しました。');
     }
