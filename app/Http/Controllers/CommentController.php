@@ -3,28 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\HikyoRequest;
-use App\Services\HikyoService;
+use App\Services\CommentService;
+use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\Auth;
-use Exception;
 
-class HikyoController extends Controller
+class CommentController extends Controller
 {
     /**
-     * @var hikyoService
+     * The CommentService implementation.
+     *
+     * @var CommentService
      */
-    protected $hikyo_service;
+    protected $comment_service;
+
     /**
      * Create a new controller instance.
      *
-     * @param  HikyoService  $hikyo_service
      * @return void
      */
     public function __construct(
-        HikyoService $hikyo_service // インジェクション
-    ) {
-        $this->middleware('auth')->except('index');
-        $this->hikyo_service = $hikyo_service; // プロパティに代入する。
+        CommentService $comment_service
+    ){
+        $this->middleware('auth');
+        $this->comment_service = $comment_service;
     }
     /**
      * Display a listing of the resource.
@@ -33,8 +34,7 @@ class HikyoController extends Controller
      */
     public function index()
     {
-        $hikyos = $this->hikyo_service->getHikyos(3);
-        return view('hikyos.index', compact('hikyos'));
+        //
     }
 
     /**
@@ -50,21 +50,20 @@ class HikyoController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  App\Http\Requests\HikyoRequest  $request
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function store(HikyoRequest $request)
+    public function store(CommentRequest $request, int $id)
     {
         try {
-            $data = $request->only(
-                ['name', 'content', 'place', 'introduction', 'time_from_tokyo', 'how_much_from_tokyo', 'caution']
-            );
-            $this->hikyo_service->createNewHikyo($data, Auth::id()); // new せずとも $this-> の形で呼び出せる（インジェクションした為）。
+            $data = $request->validated();
+            $data['user_id'] = Auth::id();
+            $this->comment_service->createNewComment($data, $id);
         } catch (Exception $error) {
-            return redirect()->route('hikyos.index')->with('error', '秘境の新規作成に失敗しました。');
+            return redirect()->route('hikyos.index')->with('error', 'コメントの投稿ができませんでした。');
         }
-        // redirect to index method
-        return redirect()->route('hikyos.index')->with('success', '秘境の新規作成が完了しました。');
+        return redirect()->route('hikyos.index')->with('success', 'コメントを投稿しました');
     }
 
     /**

@@ -91,4 +91,17 @@ class HikyoService
             'hikyo_id' => $hikyo_id
         ];
     }
+
+    /**
+     * Get paginated hikyos
+     *
+     * @param integer $per_page
+     * @return Hikyo $hikyos
+     */
+    public function getHikyos(int $per_page)
+    {
+        $hikyos = $this->hikyo_repository->getPaginatedHikyos($per_page);
+        $hikyos->load('user', 'comments.user');
+        return $hikyos;
+    }
 }

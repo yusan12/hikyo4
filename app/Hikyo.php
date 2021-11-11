@@ -20,4 +20,13 @@ class Hikyo extends Model
     protected $fillable = [
         'name', 'user_id', 'place', 'introduction', 'lank', 'time_from_tokyo', 'how_much_from_tokyo', 'caution'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+    public function comments()
+    {
+        return $this->hasMany('App\Comment');
+    }
 }
