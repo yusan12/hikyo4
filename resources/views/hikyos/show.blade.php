@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@inject('comment_service', 'App\Services\CommentService')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -16,7 +17,7 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <p>{{ $loop->iteration }} {{ $comment->user->name }} {{ $comment->created_at }}</p>
-                    <p class="mb-0">{{ $comment->body }}</p>
+                    <p class="mb-0">{!! $comment_service->convertUrl($comment->body) !!}</p>
                 </div>
             </div>
             @endforeach

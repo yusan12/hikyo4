@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+
+@inject('comment_service', 'App\Services\CommentService')
 <div class="container">
     @include('layouts.flash-message')
     <div class="row justify-content-center">
@@ -18,7 +20,7 @@
                         @foreach ($hikyo->comments as $comment)
                             <div class="card-body">
                                 <h5 class="card-title">{{ $loop->iteration }} 名前：{{ $comment->user->name }}：{{ $comment->created_at }}</h5>
-                                <p class="card-text">{{ $comment->body }}</p>
+                                <p class="mb-0">{!! $comment_service->convertUrl($comment->body) !!}</p>
                             </div>
                     @endforeach
                     <div class="card-footer">
