@@ -41,4 +41,19 @@ class CommentService
         DB::commit();
         return $comment;
     }
+
+    /**
+     * Convert link from comment
+     *
+     * @param string $comment
+     * @return string $comment
+     */
+    public function convertUrl(string $comment)
+    {
+        $comment = e($comment);
+        $pattern = '/((?:https?|ftp):\/\/[-_.!~*\'()a-zA-Z0-9;\/?:@&=+$,%#]+)/';
+        $replace = '<a href="$1" target="_blank">$1</a>';
+        $comment = preg_replace($pattern, $replace, $comment);
+        return $comment;
+    }
 }
