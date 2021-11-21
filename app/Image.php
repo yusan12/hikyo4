@@ -1,29 +1,24 @@
 <?php
+
 namespace App;
+
 use Illuminate\Database\Eloquent\Model;
-class Comment extends Model
+
+class Image extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'comments';
+    protected $table = 'images';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'body', 'hikyo_id', 'user_id'
+        'comment_id', 's3_file_path'
     ];
-    public function user()
-    {
-        return $this->belongsTo('App\User');
-    }
-
-    public function images()
-    {
-        return $this->hasMany('App\Image');
-    }
 }

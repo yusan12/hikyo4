@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Http\Requests;
-
 use Illuminate\Foundation\Http\FormRequest;
-
 class CommentRequest extends FormRequest
 {
     /**
@@ -15,7 +12,6 @@ class CommentRequest extends FormRequest
     {
         return true;
     }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -24,14 +20,17 @@ class CommentRequest extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'required',
+            'body'     => 'required',
+            'images.*' => 'image|mimes:jpg,png,jpeg,gif,svg',
         ];
     }
 
     public function comments()
     {
         return [
-            'body.required'  => trans('validation.required'),
+            'body.required' => trans('validation.required'),
+            'images.image'  => trans('validation.image'),
+            'images.mimes'  => trans('validation.mimes'),
         ];
     }
 }
