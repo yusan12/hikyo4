@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Image;
 use Illuminate\Http\Request;
+use App\Services\ImageService;
 use App\Services\CommentService;
-use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CommentRequest;
 
 class CommentController extends Controller
 {
@@ -17,16 +19,26 @@ class CommentController extends Controller
     protected $comment_service;
 
     /**
+     * The ImageService implementation.
+     *
+     * @var ImageService
+     */
+    protected $image_service;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
     public function __construct(
-        CommentService $comment_service
-    ){
+        CommentService $comment_service,
+        ImageService $image_service
+    ) {
         $this->middleware('auth');
         $this->comment_service = $comment_service;
+        $this->image_service = $image_service;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -36,7 +48,6 @@ class CommentController extends Controller
     {
         //
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -46,7 +57,6 @@ class CommentController extends Controller
     {
         //
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -59,13 +69,17 @@ class CommentController extends Controller
         try {
             $data = $request->validated();
             $data['user_id'] = Auth::id();
-            $this->comment_service->createNewComment($data, $id);
-        } catch (Exception $error) {
-            return redirect()->route('hikyos.show', $id)->with('error', 'コメントの投稿ができませんでした。');
-        }
-        return redirect()->route('hikyos.show', $id)->with('success', 'コメントを投稿しました');
-    }
+            $comment = $this->comment_service->createNewComment($data, $id);
 
+            $images = $request->file('images');
+            if ($images) {
+                $this->image_service->createNewImages($images, $comment->id);
+            }
+        } catch (Exception $error) {
+            return redirect()->route('hikyos.show', $id)->with('error', 'メッセージの投稿ができませんでした。');
+        }
+        return redirect()->route('hikyos.show', $id)->with('success', 'メッセージを投稿しました');
+    }
     /**
      * Display the specified resource.
      *
@@ -76,7 +90,6 @@ class CommentController extends Controller
     {
         //
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -87,7 +100,6 @@ class CommentController extends Controller
     {
         //
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -99,7 +111,6 @@ class CommentController extends Controller
     {
         //
     }
-
     /**
      * Remove the specified resource from storage.
      *
